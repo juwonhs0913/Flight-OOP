@@ -1,0 +1,190 @@
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --sky-deep: #050d1a;
+  --sky-mid: #0a1628;
+  --sky-upper: #0f2040;
+  --amber: #f59e0b;
+  --amber-light: #fcd34d;
+  --teal: #06b6d4;
+  --runway-gray: #374151;
+  --terminal-glass: rgba(15, 32, 64, 0.7);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: var(--sky-deep);
+  color: white;
+  font-family: 'DM Sans', sans-serif;
+  overflow-x: hidden;
+}
+
+/* Stars background */
+.stars-bg {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle var(--duration, 3s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
+}
+
+/* Node glow effects */
+.node-adt {
+  background: linear-gradient(135deg, #1e3a5f, #0f2040);
+  border: 1.5px solid #3b82f6;
+  box-shadow: 0 0 30px rgba(59, 130, 246, 0.3), inset 0 0 20px rgba(59, 130, 246, 0.05);
+}
+
+.node-adt:hover {
+  box-shadow: 0 0 50px rgba(59, 130, 246, 0.6), inset 0 0 30px rgba(59, 130, 246, 0.1);
+  border-color: #60a5fa;
+}
+
+.node-base {
+  background: linear-gradient(135deg, #1a3a2a, #0d2018);
+  border: 1.5px solid #10b981;
+  box-shadow: 0 0 30px rgba(16, 185, 129, 0.3), inset 0 0 20px rgba(16, 185, 129, 0.05);
+}
+
+.node-base:hover {
+  box-shadow: 0 0 50px rgba(16, 185, 129, 0.6);
+  border-color: #34d399;
+}
+
+.node-passenger {
+  background: linear-gradient(135deg, #2d1b4e, #1a0f30);
+  border: 1.5px solid #a78bfa;
+  box-shadow: 0 0 30px rgba(167, 139, 250, 0.3);
+}
+
+.node-passenger:hover {
+  box-shadow: 0 0 50px rgba(167, 139, 250, 0.7);
+  border-color: #c4b5fd;
+}
+
+.node-cargo {
+  background: linear-gradient(135deg, #3d2000, #221200);
+  border: 1.5px solid #f59e0b;
+  box-shadow: 0 0 30px rgba(245, 158, 11, 0.3);
+}
+
+.node-cargo:hover {
+  box-shadow: 0 0 50px rgba(245, 158, 11, 0.7);
+  border-color: #fcd34d;
+}
+
+/* SVG connector lines */
+.connector-line {
+  stroke-dasharray: 6 4;
+  animation: dash 1.5s linear infinite;
+}
+
+@keyframes dash {
+  to { stroke-dashoffset: -20; }
+}
+
+/* Airport scene */
+.airport-ground {
+  background: linear-gradient(to bottom, #1f2937, #111827);
+}
+
+.runway-line {
+  animation: runway-scroll 1s linear infinite;
+}
+
+@keyframes runway-scroll {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-60px); }
+}
+
+/* Plane path animation */
+@keyframes planeBoarding {
+  0%   { transform: translateX(0px) translateY(0px); }
+  100% { transform: translateX(0px) translateY(0px); }
+}
+
+@keyframes planeTaxi {
+  0%   { transform: translateX(-120px); }
+  100% { transform: translateX(0px); }
+}
+
+@keyframes planeTakeoff {
+  0%   { transform: translateX(0px) translateY(0px) rotate(0deg); }
+  60%  { transform: translateX(80px) translateY(-10px) rotate(-5deg); }
+  100% { transform: translateX(200px) translateY(-80px) rotate(-15deg) scale(0.6); opacity: 0; }
+}
+
+.plane-takeoff {
+  animation: planeTakeoff 2.5s ease-in forwards;
+}
+
+.plane-taxi {
+  animation: planeTaxi 1.5s ease-out forwards;
+}
+
+/* Glass panel */
+.glass-panel {
+  background: rgba(10, 22, 40, 0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+/* Shimmer text */
+.shimmer-text {
+  background: linear-gradient(90deg, #f59e0b, #fcd34d, #f59e0b);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: shimmer 2s linear infinite;
+}
+
+/* Log terminal */
+.log-entry {
+  animation: fadeSlideIn 0.3s ease-out forwards;
+}
+
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* Person walking animation */
+@keyframes personWalk {
+  0%   { transform: translateX(-50px); opacity: 0; }
+  20%  { opacity: 1; }
+  100% { transform: translateX(10px); opacity: 1; }
+}
+
+@keyframes cargoBox {
+  0%   { transform: translateY(20px) scale(0.5); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.walking-person {
+  animation: personWalk 1.2s ease-out forwards;
+}
+
+.cargo-box {
+  animation: cargoBox 0.5s ease-out forwards;
+}
