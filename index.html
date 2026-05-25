@@ -288,16 +288,16 @@
                     { x: '83%', y: '26%', rot: '90deg', duration: 500 },     
                     { x: '83%', y: '19%', rot: '270deg', duration: 1000 },  
                     { x: '78%', y: '19%', rot: '180deg', duration: 1500 }, 
-                    { x: '78%', y: '85%', rot: '90deg', duration: 1000 },  
-                    { x: '70%', y: '85%', rot: '0deg', duration: 1000 },   
-                    { x: '70%', y: '75%', rot: '-90deg', duration: 500 }   
+                    { x: '78%', y: '85%', rot: '90deg', duration: 4000 },  
+                    { x: '70%', y: '85%', rot: '180deg', duration: 1000 },   
+                    { x: '70%', y: '75%', rot: '270deg', duration: 500 }   
                 ];
             } else {
                 waypoints = [
                     { x: '33%', y: '79%', rot: '136deg', duration: 500 },     
-                    { x: '40%', y: '75%', rot: '0deg', duration: 2000 },  
-                    { x: '40%', y: '85%', rot: '90deg', duration: 2000 }, 
-                    { x: '70%', y: '85%', rot: '0deg', duration: 2000 },  
+                    { x: '40%', y: '75%', rot: '0deg', duration: 1000 },  
+                    { x: '40%', y: '85%', rot: '90deg', duration: 1000 }, 
+                    { x: '70%', y: '85%', rot: '0deg', duration: 4000 },  
                     { x: '70%', y: '75%', rot: '-90deg', duration: 1000 } 
                 ];
             }
@@ -324,7 +324,7 @@
                 plane.style.opacity = '1';
             }, 100);
 
-            await delay(2000); 
+            await delay(5000); 
 
             // 2. Taxiing 단계
             addLog(`<strong>2. Taxiing:</strong><br> ${aircraftInstance.taxiing()}`);
@@ -335,7 +335,7 @@
                 
                 plane.style.transition = 'transform 0.4s ease-in-out';
                 plane.style.transform = `rotate(${wp.rot}) scale(1)`;
-                await delay(400); 
+                await delay(1000); 
 
                 if (wp.duration > 0) {
                     plane.style.transition = `left ${wp.duration}ms linear, top ${wp.duration}ms linear`;
@@ -346,7 +346,7 @@
                 }
             }
 
-            await delay(500); 
+            await delay(1000); 
 
             // 3. Take off 단계
             addLog(`<strong>3. Take off:</strong><br> ${aircraftInstance.takeOff()}`);
@@ -355,10 +355,15 @@
             plane.style.transition = 'all 2s ease-in';
             plane.style.left = '75%';
             plane.style.top = '-10%'; 
-            plane.style.transform = 'rotate(-90deg) scale(2)'; 
+            if (classType === 'CargoAircraft') {
+                plane.style.transform = 'rotate(270deg) scale(2)';
+            }
+            else {
+                plane.style.transform = 'rotate(-90deg) scale(2)';
+            }
             plane.style.opacity = '0'; 
             
-            await delay(2000);
+            await delay(5000);
             stopAllSounds(); // 이륙 완료 시 소리 끄기 (선택 사항, 여운을 남기고 싶다면 삭제 가능)
 
             // 시퀀스 완전 종료 및 초기화
