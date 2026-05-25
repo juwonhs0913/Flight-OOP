@@ -212,15 +212,11 @@
         // 특정 오디오 재생 함수
         function playSound(soundKey) {
             if (!isSoundOn) return;
-            
-            // 이전 단계의 소리가 겹치지 않도록 현재 재생 중인 모든 소리를 정지
             stopAllSounds(); 
             
             const audio = sfx[soundKey];
-            audio.currentTime = 0; // 처음부터 재생
-            
-            // 재생 시도 (파일이 없거나 브라우저 정책으로 차단될 경우를 대비해 catch 처리)
-            audio.play().catch(error => console.warn("오디오 재생 실패 (파일 누락 또는 브라우저 정책):", error));
+            audio.currentTime = 0; 
+            audio.play().catch(error => console.warn("오디오 재생 실패:", error));
         }
 
         // 모든 오디오 정지 함수
@@ -281,36 +277,43 @@
             
             addLog(`✈️ <strong>${classType}</strong> 실행 시퀀스`, true);
 
+            // ==========================================
+            // 택싱 구간 물리적 거리 비례 배분 (총 시간 4000ms 맞춤)
+            // ==========================================
             let waypoints = [];
             
             if (classType === 'CargoAircraft') {
+                // 총 5번의 회전 (5 * 200ms = 1000ms)
+                // 남은 직진 이동 시간: 3000ms 
                 waypoints = [
-                    { x: '83%', y: '26%', rot: '90deg', duration: 500 },     
-                    { x: '83%', y: '19%', rot: '270deg', duration: 1000 },  
-                    { x: '78%', y: '19%', rot: '180deg', duration: 1500 }, 
-                    { x: '78%', y: '85%', rot: '90deg', duration: 4000 },  
-                    { x: '70%', y: '85%', rot: '180deg', duration: 1000 },   
-                    { x: '70%', y: '75%', rot: '270deg', duration: 500 }   
+                    { x: '83%', y: '26%', rot: '90deg', duration: 0 },     
+                    { x: '83%', y: '19%', rot: '270deg', duration: 819 },  // 이동거리 가중치 배분
+                    { x: '78%', y: '19%', rot: '180deg', duration: 756 }, 
+                    { x: '78%', y: '85%', rot: '90deg', duration: 3562 },  
+                    { x: '70%', y: '85%', rot: '180deg', duration: 810 },   
+                    { x: '70%', y: '75%', rot: '270deg', duration: 813 }   
                 ];
             } else {
+                // 총 4번의 회전 (4 * 200ms = 800ms)
+                // 남은 직진 이동 시간: 3200ms
                 waypoints = [
-                    { x: '33%', y: '79%', rot: '136deg', duration: 500 },     
-                    { x: '40%', y: '75%', rot: '0deg', duration: 1000 },  
-                    { x: '40%', y: '85%', rot: '90deg', duration: 1000 }, 
-                    { x: '70%', y: '85%', rot: '0deg', duration: 4000 },  
-                    { x: '70%', y: '75%', rot: '-90deg', duration: 1000 } 
+                    { x: '33%', y: '79%', rot: '136deg', duration: 0 },     
+                    { x: '40%', y: '75%', rot: '0deg', duration: 844 },  
+                    { x: '40%', y: '85%', rot: '90deg', duration: 1051 }, 
+                    { x: '70%', y: '85%', rot: '0deg', duration: 3053 },  
+                    { x: '70%', y: '75%', rot: '-90deg', duration: 1052 } 
                 ];
             }
 
-            // 1. Boarding 단계
+            // ----------------------------------------------------
+            // 1. Boarding 단계 (정확히 4초 소요)
+            // ----------------------------------------------------
             const startPoint = waypoints[0];
             addLog(`<strong>1. Boarding:</strong><br> ${aircraftInstance.boarding(gateNumber)}`);
             
-            // 객체 타입에 따라 Boarding 사운드 분기 처리
             if (classType === 'CargoAircraft') {
                 playSound('cargoBoarding');
             } else {
-                // CommercialAircraft, PassengerAircraft
                 playSound('passengerBoarding');
             }
 
@@ -324,35 +327,42 @@
                 plane.style.opacity = '1';
             }, 100);
 
-            await delay(5000); 
+            await delay(4000); // 탑승 및 대기 시간 (4초)
+            await delay(1000); // 사운드 잔향 제거 위해 약간의 여유 시간 추가
 
-            // 2. Taxiing 단계
+            // ----------------------------------------------------
+            // 2. Taxiing 단계 (정확히 4초 소요)
+            // ----------------------------------------------------
             addLog(`<strong>2. Taxiing:</strong><br> ${aircraftInstance.taxiing()}`);
-            playSound('taxiing'); // 택싱 사운드 재생
+            playSound('taxiing'); 
             
             for (let i = 1; i < waypoints.length; i++) {
                 const wp = waypoints[i];
                 
-                plane.style.transition = 'transform 0.4s ease-in-out';
+                // 회전 단계 (고정 0.2초)
+                plane.style.transition = 'transform 0.2s ease-in-out';
                 plane.style.transform = `rotate(${wp.rot}) scale(1)`;
-                await delay(1000); 
+                await delay(200); 
 
+                // 직진 이동 단계 (비례 배분된 시간 적용)
                 if (wp.duration > 0) {
                     plane.style.transition = `left ${wp.duration}ms linear, top ${wp.duration}ms linear`;
                     plane.style.left = wp.x;
                     plane.style.top = wp.y;
                     
                     await delay(wp.duration); 
+                    
                 }
             }
+            await delay(2000);
 
-            await delay(1000); 
-
-            // 3. Take off 단계
+            // ----------------------------------------------------
+            // 3. Take off 단계 (정확히 4초 소요)
+            // ----------------------------------------------------
             addLog(`<strong>3. Take off:</strong><br> ${aircraftInstance.takeOff()}`);
-            playSound('takeoff'); // 이륙 사운드 재생
+            playSound('takeoff'); 
             
-            plane.style.transition = 'all 2s ease-in';
+            plane.style.transition = 'all 4s ease-in'; // 이륙 이동 트랜지션을 4초에 맞춤
             plane.style.left = '75%';
             plane.style.top = '-10%'; 
             if (classType === 'CargoAircraft') {
@@ -363,8 +373,8 @@
             }
             plane.style.opacity = '0'; 
             
-            await delay(5000);
-            stopAllSounds(); // 이륙 완료 시 소리 끄기 (선택 사항, 여운을 남기고 싶다면 삭제 가능)
+            await delay(4000); // 이륙 애니메이션 시간 (4초)
+            stopAllSounds(); 
 
             // 시퀀스 완전 종료 및 초기화
             isAnimating = false;
