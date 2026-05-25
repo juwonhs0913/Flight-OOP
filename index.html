@@ -22,7 +22,6 @@
 
         /* 하단 공항 위성사진 맵 설정 */
         .airport-map-bg {
-            /* 같은 폴더에 있는 로컬 이미지 파일 불러오기 */
             background-image: url('./airport.jpg');
             background-color: #334155; 
             background-size: cover;
@@ -38,7 +37,6 @@
             text-shadow: 0 0 4px rgba(255,255,255,0.8); 
             opacity: 0;
             z-index: 20;
-            transition: all 2s ease-in-out; 
             margin-left: -20px; 
             margin-top: -20px;
         }
@@ -182,6 +180,9 @@
         
         let isAnimating = false;
 
+        // 비동기 대기(sleep) 함수
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
         function addLog(message, isHeader = false) {
             const div = document.createElement('div');
             if (isHeader) {
@@ -197,18 +198,14 @@
 
         function showADTInfo() {
             if (emptyLogMsg) emptyLogMsg.style.display = 'none';
-            
             addLog(`✈️ <strong>FlightADT</strong> 명세서 조회`, true);
-            
             const adtContent = `
                 <div class="text-gray-900 font-bold text-base mb-3 border-b border-gray-300 pb-2">Flight-ADT를 선택하였습니다.</div>
-                
                 <div class="mb-2"><span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold mr-1">Properties</span></div>
                 <ul class="list-disc list-inside text-gray-600 ml-1 mb-4 space-y-1">
                     <li>location <span class="text-gray-400 italic">(abstract property)</span></li>
                     <li>callsign <span class="text-gray-400 italic">(abstract property)</span></li>
                 </ul>
-
                 <div class="mb-2"><span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold mr-1">Methods</span></div>
                 <ul class="list-disc list-inside text-gray-600 ml-1 space-y-1">
                     <li>boarding(gate_number : int) <span class="text-gray-400 italic">(abstract method)</span></li>
@@ -219,7 +216,8 @@
             addLog(adtContent);
         }
 
-        function triggerFlight(aircraftInstance) {
+        // async 함수로 변경하여 경로 이동을 순차적으로 제어
+        async function triggerFlight(aircraftInstance) {
             if (isAnimating) return; 
             isAnimating = true;
 
@@ -233,70 +231,83 @@
             
             addLog(`✈️ <strong>${classType}</strong> 실행 시퀀스`, true);
 
-            // --- 클래스 타입에 따른 시작 위치 및 방향 계산 분기 ---
-            let startX, startY, startRotation, taxiRotation;
+            // ==========================================
+            // 💡 [택싱 웨이포인트(경유지) 커스텀 설정]
+            // ==========================================
+            // 아래 배열에 경유지를 추가하거나 수정해서 경로를 만들어주세요.
+            // x, y: 위치(%)
+            // rot: 비행기가 바라보는 방향 (0deg: 오른쪽, 90deg: 아래쪽, 180deg: 왼쪽, -90deg: 위쪽)
+            // duration: 해당 지점까지 이동하는 데 걸리는 시간(ms)
+            
+            let waypoints = [];
             
             if (classType === 'CargoAircraft') {
-                // 화물청사 (오른쪽 중간 구역) 시작
-                startX = '84%';
-                startY = '29%';
-                startRotation = '90deg'; // 남서쪽(대각선 왼쪽 아래)을 향해 대기
-                taxiRotation = '210deg';  // 활주로 진입 시 기수 방향
+                waypoints = [
+                    { x: '84%', y: '29%', rot: '90deg', duration: 500 },     // [시작점] 화물청사 대기
+                    { x: '84%', y: '50%', rot: '90deg', duration: 1000 },  // 1. 아래로 직진
+                    { x: '60%', y: '50%', rot: '180deg', duration: 1500 }, // 2. 왼쪽으로 꺾기
+                    { x: '60%', y: '75%', rot: '90deg', duration: 1000 },  // 3. 다시 아래로 직진
+                    { x: '75%', y: '75%', rot: '0deg', duration: 1000 },   // 4. 활주로 입구 진입(오른쪽)
+                    { x: '75%', y: '75%', rot: '-90deg', duration: 500 }   // 5. 이륙 방향(위쪽)으로 정렬
+                ];
             } else {
-                // 제1 터미널 (왼쪽 아래 구역) 시작 - PassengerAircraft 및 Base
-                startX = '15%';
-                startY = '75%';
-                startRotation = '90deg';  // 동쪽(오른쪽)을 향해 대기
-                taxiRotation = '90deg';   // 활주로 진입 시 기수 방향
+                waypoints = [
+                    { x: '33%', y: '79%', rot: '136deg', duration: 500 },     // [시작점] 제1터미널 대기
+                    { x: '40%', y: '75%', rot: '0deg', duration: 1500 },  // 1. 오른쪽으로 직진
+                    { x: '40%', y: '85%', rot: '90deg', duration: 1000 }, // 2. 아래로 꺾기
+                    { x: '75%', y: '85%', rot: '0deg', duration: 2000 },  // 3. 오른쪽으로 꺾어서 길게 직진
+                    { x: '70%', y: '75%', rot: '-90deg', duration: 1000 } // 4. 활주로 진입 후 이륙 방향(위쪽) 정렬
+                ];
             }
+            // ==========================================
 
+            // 1. Boarding 단계 (시작점으로 이동)
+            const startPoint = waypoints[0];
             addLog(`<strong>1. Boarding:</strong><br> ${aircraftInstance.boarding(gateNumber)}`);
             
-            // 지정된 시작 위치에 비행기 배치
             plane.style.transition = 'none';
-            plane.style.left = startX;
-            plane.style.top = startY;
-            plane.style.transform = `rotate(${startRotation}) scale(1)`;
+            plane.style.left = startPoint.x;
+            plane.style.top = startPoint.y;
+            plane.style.transform = `rotate(${startPoint.rot}) scale(1)`;
             
-            // 서서히 나타남
             setTimeout(() => {
                 plane.style.transition = 'opacity 0.5s';
                 plane.style.opacity = '1';
             }, 100);
 
-            // Taxiing: 공통 목적지(활주로 시작점)로 이동
-            setTimeout(() => {
-                addLog(`<strong>2. Taxiing:</strong><br> ${aircraftInstance.taxiing()}`);
-                plane.style.transition = 'all 2.5s ease-in-out';
-                plane.style.left = '75%'; // 활주로 X 좌표
-                plane.style.top = '75%';  // 활주로 Y 좌표
-                plane.style.transform = `rotate(${taxiRotation}) scale(1)`; 
+            await delay(2000); // 탑승 및 대기 시간
+
+            // 2. Taxiing 단계 (웨이포인트 순차 이동)
+            addLog(`<strong>2. Taxiing:</strong><br> ${aircraftInstance.taxiing()}`);
+            
+            for (let i = 1; i < waypoints.length; i++) {
+                const wp = waypoints[i];
+                // 각 이동마다 리니어(등속) 트랜지션 적용
+                plane.style.transition = `all ${wp.duration}ms linear`;
+                plane.style.left = wp.x;
+                plane.style.top = wp.y;
+                plane.style.transform = `rotate(${wp.rot}) scale(1)`;
                 
-                // 활주로 진입 완료 시 이륙 방향(북쪽)으로 기수 정렬
-                setTimeout(() => {
-                    plane.style.transform = 'rotate(-90deg) scale(1)'; 
-                }, 2000);
+                await delay(wp.duration); // 해당 위치까지 이동할 때까지 대기
+            }
 
-            }, 2000);
+            await delay(500); // 이륙 전 잠시 대기 (Line up and wait)
 
-            // Take off: 활주로를 따라 이륙
-            setTimeout(() => {
-                addLog(`<strong>3. Take off:</strong><br> ${aircraftInstance.takeOff()}`);
-                plane.style.transition = 'all 2s ease-in';
-                plane.style.left = '75%';
-                plane.style.top = '-10%'; // 화면 밖 위쪽으로 이동
-                plane.style.transform = 'rotate(-90deg) scale(2)'; // 고도 상승 효과
-                plane.style.opacity = '0'; // 사라짐
-                
-                // 애니메이션 종료 및 맵 초기화
-                setTimeout(() => {
-                    isAnimating = false;
-                    mapOverlay.classList.remove('hidden');
-                    mapOverlay.style.opacity = '1';
-                    mapOverlay.querySelector('span').innerText = "DISPATCH COMPLETED. READY FOR NEXT.";
-                }, 2000);
+            // 3. Take off 단계 (이륙 애니메이션)
+            addLog(`<strong>3. Take off:</strong><br> ${aircraftInstance.takeOff()}`);
+            plane.style.transition = 'all 2s ease-in';
+            plane.style.left = '75%';
+            plane.style.top = '-10%'; // 화면 위쪽 밖으로
+            plane.style.transform = 'rotate(-90deg) scale(2)'; // 커지면서 상승
+            plane.style.opacity = '0'; // 사라짐
+            
+            await delay(2000);
 
-            }, 5500);
+            // 시퀀스 완전 종료 및 초기화
+            isAnimating = false;
+            mapOverlay.classList.remove('hidden');
+            mapOverlay.style.opacity = '1';
+            mapOverlay.querySelector('span').innerText = "DISPATCH COMPLETED. READY FOR NEXT.";
         }
     </script>
 </body>
