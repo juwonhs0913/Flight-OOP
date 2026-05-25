@@ -196,8 +196,11 @@
 
         // --- 오디오 객체 생성 및 매핑 ---
         const sfx = {
+            /*
             cargoBoarding: new Audio('./data/cargo_boarding.mp3'),
             passengerBoarding: new Audio('./data/passenger_boarding.mp3'),
+            */
+            airport: new Audio('./data/base_airport.mp3'),
             taxiing: new Audio('./data/taxiing.mp3'),
             takeoff: new Audio('./data/takeoff.mp3')
         };
@@ -310,13 +313,14 @@
             // ----------------------------------------------------
             const startPoint = waypoints[0];
             addLog(`<strong>1. Boarding:</strong><br> ${aircraftInstance.boarding(gateNumber)}`);
-            
+            /*
             if (classType === 'CargoAircraft') {
                 playSound('cargoBoarding');
             } else {
                 playSound('passengerBoarding');
             }
-
+            */
+            playSound('airport');
             plane.style.transition = 'none';
             plane.style.left = startPoint.x;
             plane.style.top = startPoint.y;
@@ -354,11 +358,12 @@
                     
                 }
             }
-            await delay(2000);
+            
 
             // ----------------------------------------------------
             // 3. Take off 단계 (정확히 4초 소요)
             // ----------------------------------------------------
+            await delay(100);
             addLog(`<strong>3. Take off:</strong><br> ${aircraftInstance.takeOff()}`);
             playSound('takeoff'); 
             
@@ -374,6 +379,7 @@
             plane.style.opacity = '0'; 
             
             await delay(4000); // 이륙 애니메이션 시간 (4초)
+            await delay(6000); // 사운드 잔향 제거 위해 약간의 여유 시간 추가
             stopAllSounds(); 
 
             // 시퀀스 완전 종료 및 초기화
