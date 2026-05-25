@@ -62,44 +62,88 @@
 
     <div class="w-3/5 flex flex-col border-r border-gray-200">
         
-        <div class="h-[55%] bg-slate-50 relative p-8 shadow-inner flex flex-col justify-center">
+        <div class="h-[60%] bg-slate-50 relative p-6 shadow-inner flex flex-col justify-center">
             <div class="absolute top-4 left-6">
                 <h1 class="text-2xl font-black text-gray-900 tracking-tight">AIRCRAFT OOP HIERARCHY</h1>
-                <p class="text-gray-500 mt-1 text-sm font-medium">클래스 노드를 클릭하여 실행 애니메이션과 다형성을 확인하세요.</p>
+                <p class="text-gray-500 mt-1 text-sm font-medium">클래스는 명세서를 조회하고, 하단의 인스턴스(객체)를 눌러 실행하세요.</p>
             </div>
 
-            <div class="flex flex-col items-center gap-6 mt-8 relative">
-                <div class="absolute w-1 bg-gray-300 h-[100%] top-6 left-1/2 transform -translate-x-1/2 z-0"></div>
+            <div class="flex flex-col items-center gap-3 mt-6 relative">
+                <div class="absolute w-1 bg-gray-300 h-full top-4 left-1/2 transform -translate-x-1/2 z-0"></div>
 
-                <button onclick="showADTInfo()" class="node-card bg-gray-50 px-8 py-3 rounded-xl shadow-sm border-2 border-dashed border-gray-500 w-64 flex flex-col items-center z-10 relative cursor-pointer">
-                    <span class="text-2xl text-gray-500 mb-1">&#x2708;</span>
+                <button onclick="showADTInfo()" class="node-card bg-gray-50 px-8 py-2 rounded-xl shadow-sm border-2 border-dashed border-gray-500 w-64 flex flex-col items-center z-10 relative cursor-pointer">
+                    <span class="text-xl text-gray-500 mb-1">&#x2708;</span>
                     <span class="font-bold text-gray-700">FlightADT</span>
                     <span class="text-xs text-gray-400 font-semibold">Abstract Base Class</span>
                 </button>
 
-                <button onclick="triggerFlight(baseAircraft)" class="node-card bg-white px-8 py-3 rounded-xl shadow-md border-2 border-gray-800 w-64 flex flex-col items-center z-10 relative">
-                    <span class="text-2xl text-black mb-1">&#x2708;</span>
+                <button onclick="showClassInfo('CommercialAircraft')" class="node-card bg-white px-8 py-2 rounded-xl shadow-md border-2 border-gray-800 w-64 flex flex-col items-center z-10 relative mt-2 cursor-pointer">
+                    <span class="text-xl text-black mb-1">&#x2708;</span>
                     <span class="font-bold text-gray-900">CommercialAircraft</span>
                     <span class="text-xs text-gray-500 font-semibold">Base Class</span>
                 </button>
 
-                <div class="flex gap-16 w-full justify-center z-10 relative bg-slate-50 pt-2">
-                    <button onclick="triggerFlight(passengerAircraft)" class="node-card bg-white px-8 py-3 rounded-xl shadow-md border-2 border-blue-600 w-64 flex flex-col items-center">
-                        <span class="text-2xl text-black mb-1">&#x2708;</span>
-                        <span class="font-bold text-gray-900">PassengerAircraft</span>
-                        <span class="text-xs text-blue-600 font-semibold">Derived Class</span>
-                    </button>
+                <div class="flex gap-10 w-full justify-center z-10 relative bg-slate-50 pt-2 pb-2">
+                    
+                    <div class="flex flex-col items-center">
+                        <button onclick="showClassInfo('PassengerAircraft')" class="node-card bg-gray-50 px-6 py-2 rounded-xl shadow-sm border-2 border-blue-400 w-52 flex flex-col items-center z-10 cursor-pointer">
+                            <span class="font-bold text-gray-800 text-sm">PassengerAircraft</span>
+                            <span class="text-[11px] text-blue-500 font-semibold">Derived Class</span>
+                        </button>
+                        
+                        <div class="w-1 h-4 bg-gray-300"></div>
+                        <div class="w-48 h-1 bg-gray-300"></div>
+                        <div class="flex justify-between w-48">
+                            <div class="w-1 h-4 bg-gray-300"></div>
+                            <div class="w-1 h-4 bg-gray-300"></div>
+                        </div>
+                        
+                        <div class="flex gap-4 mt-[-2px] z-10">
+                            <button onclick="triggerFlight(passenger1)" class="node-card bg-white px-2 py-3 rounded-xl shadow-md border-[3px] border-blue-600 w-28 flex flex-col items-center cursor-pointer">
+                                <span class="text-2xl text-black mb-1">&#x2708;</span>
+                                <span class="font-bold text-gray-900 text-[13px]">PMDG 777</span>
+                                <span class="text-[10px] text-blue-600 font-bold mt-0.5">Instance 1</span>
+                            </button>
+                            <button onclick="triggerFlight(passenger2)" class="node-card bg-white px-2 py-3 rounded-xl shadow-md border-[3px] border-blue-600 w-28 flex flex-col items-center cursor-pointer">
+                                <span class="text-2xl text-black mb-1">&#x2708;</span>
+                                <span class="font-bold text-gray-900 text-[13px]">Boeing 737</span>
+                                <span class="text-[10px] text-blue-600 font-bold mt-0.5">Instance 2</span>
+                            </button>
+                        </div>
+                    </div>
 
-                    <button onclick="triggerFlight(cargoAircraft)" class="node-card bg-white px-8 py-3 rounded-xl shadow-md border-2 border-green-600 w-64 flex flex-col items-center">
-                        <span class="text-2xl text-black mb-1">&#x2708;</span>
-                        <span class="font-bold text-gray-900">CargoAircraft</span>
-                        <span class="text-xs text-green-600 font-semibold">Derived Class</span>
-                    </button>
+                    <div class="flex flex-col items-center">
+                        <button onclick="showClassInfo('CargoAircraft')" class="node-card bg-gray-50 px-6 py-2 rounded-xl shadow-sm border-2 border-green-400 w-52 flex flex-col items-center z-10 cursor-pointer">
+                            <span class="font-bold text-gray-800 text-sm">CargoAircraft</span>
+                            <span class="text-[11px] text-green-500 font-semibold">Derived Class</span>
+                        </button>
+                        
+                        <div class="w-1 h-4 bg-gray-300"></div>
+                        <div class="w-48 h-1 bg-gray-300"></div>
+                        <div class="flex justify-between w-48">
+                            <div class="w-1 h-4 bg-gray-300"></div>
+                            <div class="w-1 h-4 bg-gray-300"></div>
+                        </div>
+                        
+                        <div class="flex gap-4 mt-[-2px] z-10">
+                            <button onclick="triggerFlight(cargo1)" class="node-card bg-white px-2 py-3 rounded-xl shadow-md border-[3px] border-green-600 w-28 flex flex-col items-center cursor-pointer">
+                                <span class="text-2xl text-black mb-1">&#x2708;</span>
+                                <span class="font-bold text-gray-900 text-[13px]">Boeing 747F</span>
+                                <span class="text-[10px] text-green-600 font-bold mt-0.5">Instance 3</span>
+                            </button>
+                            <button onclick="triggerFlight(cargo2)" class="node-card bg-white px-2 py-3 rounded-xl shadow-md border-[3px] border-green-600 w-28 flex flex-col items-center cursor-pointer">
+                                <span class="text-2xl text-black mb-1">&#x2708;</span>
+                                <span class="font-bold text-gray-900 text-[13px]">Airbus A330F</span>
+                                <span class="text-[10px] text-green-600 font-bold mt-0.5">Instance 4</span>
+                            </button>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </div>
 
-        <div class="h-[45%] airport-map-bg border-t-4 border-gray-800 relative">
+        <div class="h-[40%] airport-map-bg border-t-4 border-gray-800 relative">
             <button id="sound-toggle" onclick="toggleSound()" class="absolute top-4 right-4 z-40 bg-white bg-opacity-90 px-3 py-2 rounded-lg shadow-md font-bold text-lg border border-gray-300">
                 🔊
             </button>
@@ -123,11 +167,12 @@
         </div>
         
         <div id="log-panel" class="flex-1 overflow-y-auto space-y-4 pr-2 text-sm text-gray-800 font-medium tracking-wide">
-            <div class="text-center text-gray-400 mt-20" id="empty-log-msg">좌측의 클래스 노드를 클릭하여 시퀀스를 시작하세요.</div>
+            <div class="text-center text-gray-400 mt-20" id="empty-log-msg">하단의 객체(Instance) 노드를 클릭하여 시퀀스를 시작하세요.</div>
         </div>
     </div>
 
     <script>
+        // --- 파이썬 OOP 클래스 선언부 ---
         class CommercialAircraft {
             constructor(model, callsign) {
                 this.model = model;
@@ -181,10 +226,13 @@
             }
         }
 
-        const baseAircraft = new CommercialAircraft("Generic Model", "BASE001");
-        const passengerAircraft = new PassengerAircraft("Boeing 737", "OZ712", 120);
-        const cargoAircraft = new CargoAircraft("Boeing 777F", "KE195F", 32400);
+        // --- 인스턴스(객체) 4개 생성 ---
+        const passenger1 = new PassengerAircraft("Boeing 777", "KE1420", 300);
+        const passenger2 = new PassengerAircraft("Boeing 737", "OZ712", 120);
+        const cargo1 = new CargoAircraft("Boeing 747F", "KE195F", 32400);
+        const cargo2 = new CargoAircraft("Airbus A330F", "OZ987F", 70000);
 
+        // --- DOM 및 상태 제어 ---
         const logPanel = document.getElementById('log-panel');
         const emptyLogMsg = document.getElementById('empty-log-msg');
         const plane = document.getElementById('animated-plane');
@@ -196,33 +244,27 @@
 
         // --- 오디오 객체 생성 및 매핑 ---
         const sfx = {
-            /*
             cargoBoarding: new Audio('./data/cargo_boarding.mp3'),
             passengerBoarding: new Audio('./data/passenger_boarding.mp3'),
-            */
             airport: new Audio('./data/base_airport.mp3'),
             taxiing: new Audio('./data/taxiing.mp3'),
             takeoff: new Audio('./data/takeoff.mp3')
         };
 
-        // 음향 토글 함수
         function toggleSound() {
             isSoundOn = !isSoundOn;
             soundToggleBtn.innerText = isSoundOn ? '🔊' : '🔇';
             if (!isSoundOn) stopAllSounds();
         }
 
-        // 특정 오디오 재생 함수
         function playSound(soundKey) {
             if (!isSoundOn) return;
             stopAllSounds(); 
-            
             const audio = sfx[soundKey];
             audio.currentTime = 0; 
             audio.play().catch(error => console.warn("오디오 재생 실패:", error));
         }
 
-        // 모든 오디오 정지 함수
         function stopAllSounds() {
             Object.values(sfx).forEach(audio => {
                 audio.pause();
@@ -230,7 +272,6 @@
             });
         }
 
-        // 비동기 대기(sleep) 함수
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 
         function addLog(message, isHeader = false) {
@@ -246,11 +287,12 @@
             logPanel.scrollTop = logPanel.scrollHeight;
         }
 
+        // --- 클래스/인터페이스 정보 출력 로직 ---
         function showADTInfo() {
             if (emptyLogMsg) emptyLogMsg.style.display = 'none';
             addLog(`✈️ <strong>FlightADT</strong> 명세서 조회`, true);
             const adtContent = `
-                <div class="text-gray-900 font-bold text-base mb-3 border-b border-gray-300 pb-2">Flight-ADT를 선택하였습니다.</div>
+                <div class="text-gray-900 font-bold text-base mb-3 border-b border-gray-300 pb-2">Flight-ADT (Interface)</div>
                 <div class="mb-2"><span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold mr-1">Properties</span></div>
                 <ul class="list-disc list-inside text-gray-600 ml-1 mb-4 space-y-1">
                     <li>location <span class="text-gray-400 italic">(abstract property)</span></li>
@@ -258,14 +300,50 @@
                 </ul>
                 <div class="mb-2"><span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold mr-1">Methods</span></div>
                 <ul class="list-disc list-inside text-gray-600 ml-1 space-y-1">
-                    <li>boarding(gate_number : int) <span class="text-gray-400 italic">(abstract method)</span></li>
-                    <li>taxiing() <span class="text-gray-400 italic">(abstract method)</span></li>
-                    <li>take_off() <span class="text-gray-400 italic">(abstract method)</span></li>
+                    <li>boarding(gate_number : int) <span class="text-gray-400 italic">(abstract)</span></li>
+                    <li>taxiing() <span class="text-gray-400 italic">(abstract)</span></li>
+                    <li>take_off() <span class="text-gray-400 italic">(abstract)</span></li>
                 </ul>
             `;
             addLog(adtContent);
         }
 
+        function showClassInfo(className) {
+            if (emptyLogMsg) emptyLogMsg.style.display = 'none';
+            addLog(`✈️ <strong>${className}</strong> 클래스 구조 조회`, true);
+            
+            let content = '';
+            if (className === 'CommercialAircraft') {
+                content = `
+                    <div class="text-gray-900 font-bold text-base mb-2 border-b border-gray-300 pb-2">CommercialAircraft Base Class</div>
+                    <div class="text-sm text-gray-700 mb-2">FlightADT를 구현한 기본 상업용 항공기 클래스입니다.</div>
+                    <div class="text-xs text-gray-500 italic">하단의 인스턴스(객체)를 눌러 실제 동작을 확인하세요.</div>
+                `;
+            } else if (className === 'PassengerAircraft') {
+                content = `
+                    <div class="text-gray-900 font-bold text-base mb-2 border-b border-gray-300 pb-2">PassengerAircraft Class</div>
+                    <div class="text-sm text-gray-700 mb-2">CommercialAircraft를 상속받은 승객기 클래스입니다.</div>
+                    <div class="text-xs text-blue-600 font-bold mb-1">[추가된 속성]</div>
+                    <ul class="list-disc list-inside text-gray-600 ml-1 mb-3 space-y-1 text-sm">
+                        <li>passengerNum : int</li>
+                    </ul>
+                    <div class="text-xs text-gray-500 italic">하단의 인스턴스(객체)를 눌러 실제 동작을 확인하세요.</div>
+                `;
+            } else if (className === 'CargoAircraft') {
+                content = `
+                    <div class="text-gray-900 font-bold text-base mb-2 border-b border-gray-300 pb-2">CargoAircraft Class</div>
+                    <div class="text-sm text-gray-700 mb-2">CommercialAircraft를 상속받은 화물기 클래스입니다.</div>
+                    <div class="text-xs text-green-600 font-bold mb-1">[추가된 속성]</div>
+                    <ul class="list-disc list-inside text-gray-600 ml-1 mb-3 space-y-1 text-sm">
+                        <li>cargoWeightKg : float</li>
+                    </ul>
+                    <div class="text-xs text-gray-500 italic">하단의 인스턴스(객체)를 눌러 실제 동작을 확인하세요.</div>
+                `;
+            }
+            addLog(content);
+        }
+
+        // --- 인스턴스 실행(비행) 로직 ---
         async function triggerFlight(aircraftInstance) {
             if (isAnimating) return; 
             isAnimating = true;
@@ -278,48 +356,33 @@
             const gateNumber = Math.floor(Math.random() * 99) + 1;
             const classType = aircraftInstance.constructor.name;
             
-            addLog(`✈️ <strong>${classType}</strong> 실행 시퀀스`, true);
+            addLog(`✈️ <strong>${classType} Instance</strong> 실행 시퀀스`, true);
 
-            // ==========================================
-            // 택싱 구간 물리적 거리 비례 배분 (총 시간 4000ms 맞춤)
-            // ==========================================
             let waypoints = [];
             
             if (classType === 'CargoAircraft') {
-                // 총 5번의 회전 (5 * 200ms = 1000ms)
-                // 남은 직진 이동 시간: 3000ms 
                 waypoints = [
-                    { x: '83%', y: '26%', rot: '90deg', duration: 0 },     
-                    { x: '83%', y: '19%', rot: '270deg', duration: 819 },  // 이동거리 가중치 배분
-                    { x: '78%', y: '19%', rot: '180deg', duration: 756 }, 
-                    { x: '78%', y: '85%', rot: '90deg', duration: 3562 },  
-                    { x: '70%', y: '85%', rot: '180deg', duration: 810 },   
+                    { x: '83%', y: '23%', rot: '90deg', duration: 0 },     
+                    { x: '83%', y: '16%', rot: '270deg', duration: 819 },  
+                    { x: '78%', y: '16%', rot: '180deg', duration: 756 }, 
+                    { x: '78%', y: '88%', rot: '90deg', duration: 3562 },  
+                    { x: '70%', y: '88%', rot: '180deg', duration: 810 },   
                     { x: '70%', y: '75%', rot: '270deg', duration: 813 }   
                 ];
             } else {
-                // 총 4번의 회전 (4 * 200ms = 800ms)
-                // 남은 직진 이동 시간: 3200ms
                 waypoints = [
-                    { x: '33%', y: '79%', rot: '136deg', duration: 0 },     
-                    { x: '40%', y: '75%', rot: '0deg', duration: 844 },  
-                    { x: '40%', y: '85%', rot: '90deg', duration: 1051 }, 
-                    { x: '70%', y: '85%', rot: '0deg', duration: 3053 },  
+                    { x: '33%', y: '83%', rot: '134deg', duration: 0 },     
+                    { x: '40%', y: '78%', rot: '0deg', duration: 844 },  
+                    { x: '40%', y: '88%', rot: '90deg', duration: 1051 }, 
+                    { x: '70%', y: '88%', rot: '0deg', duration: 3053 },  
                     { x: '70%', y: '75%', rot: '-90deg', duration: 1052 } 
                 ];
             }
 
-            // ----------------------------------------------------
-            // 1. Boarding 단계 (정확히 4초 소요)
-            // ----------------------------------------------------
+            // 1. Boarding (4초 소요)
             const startPoint = waypoints[0];
             addLog(`<strong>1. Boarding:</strong><br> ${aircraftInstance.boarding(gateNumber)}`);
-            /*
-            if (classType === 'CargoAircraft') {
-                playSound('cargoBoarding');
-            } else {
-                playSound('passengerBoarding');
-            }
-            */
+            
             playSound('airport');
             plane.style.transition = 'none';
             plane.style.left = startPoint.x;
@@ -329,60 +392,57 @@
             setTimeout(() => {
                 plane.style.transition = 'opacity 1s';
                 plane.style.opacity = '1';
+                
+                // 안내방송/적재 사운드 중첩 실행 (airport 기본 배경음과 함께 재생)
+                if (isSoundOn) {
+                    const specificAudio = classType === 'CargoAircraft' ? sfx['cargoBoarding'] : sfx['passengerBoarding'];
+                    specificAudio.currentTime = 0;
+                    specificAudio.play().catch(e => console.warn(e));
+                }
             }, 100);
 
-            await delay(4000); // 탑승 및 대기 시간 (4초)
-            await delay(1000); // 사운드 잔향 제거 위해 약간의 여유 시간 추가
+            await delay(4000); 
+            await delay(1000); 
 
-            // ----------------------------------------------------
-            // 2. Taxiing 단계 (정확히 4초 소요)
-            // ----------------------------------------------------
+            // 2. Taxiing (4초 소요)
             addLog(`<strong>2. Taxiing:</strong><br> ${aircraftInstance.taxiing()}`);
             playSound('taxiing'); 
             
             for (let i = 1; i < waypoints.length; i++) {
                 const wp = waypoints[i];
                 
-                // 회전 단계 (고정 0.2초)
                 plane.style.transition = 'transform 0.2s ease-in-out';
                 plane.style.transform = `rotate(${wp.rot}) scale(1)`;
                 await delay(200); 
 
-                // 직진 이동 단계 (비례 배분된 시간 적용)
                 if (wp.duration > 0) {
                     plane.style.transition = `left ${wp.duration}ms linear, top ${wp.duration}ms linear`;
                     plane.style.left = wp.x;
                     plane.style.top = wp.y;
-                    
                     await delay(wp.duration); 
-                    
                 }
             }
-            
 
-            // ----------------------------------------------------
-            // 3. Take off 단계 (정확히 4초 소요)
-            // ----------------------------------------------------
+            // 3. Take off (4초 소요)
             await delay(100);
             addLog(`<strong>3. Take off:</strong><br> ${aircraftInstance.takeOff()}`);
             playSound('takeoff'); 
             
-            plane.style.transition = 'all 4s ease-in'; // 이륙 이동 트랜지션을 4초에 맞춤
+            plane.style.transition = 'all 4s ease-in';
             plane.style.left = '75%';
             plane.style.top = '-10%'; 
             if (classType === 'CargoAircraft') {
                 plane.style.transform = 'rotate(270deg) scale(2)';
-            }
-            else {
+            } else {
                 plane.style.transform = 'rotate(-90deg) scale(2)';
             }
             plane.style.opacity = '0'; 
             
-            await delay(4000); // 이륙 애니메이션 시간 (4초)
-            await delay(6000); // 사운드 잔향 제거 위해 약간의 여유 시간 추가
+            await delay(4000); 
+            await delay(6000); 
             stopAllSounds(); 
 
-            // 시퀀스 완전 종료 및 초기화
+            // 초기화
             isAnimating = false;
             mapOverlay.classList.remove('hidden');
             mapOverlay.style.opacity = '1';
