@@ -22,7 +22,7 @@
 
         /* 하단 공항 위성사진 맵 설정 */
         .airport-map-bg {
-            background-image: url('./airport.jpg');
+            background-image: url('./data/airport.jpg');
             background-color: #334155; 
             background-size: cover;
             background-position: center;
@@ -39,6 +39,14 @@
             z-index: 20;
             margin-left: -20px; 
             margin-top: -20px;
+        }
+
+        /* 음향 토글 버튼 호버 효과 */
+        #sound-toggle {
+            transition: background-color 0.2s;
+        }
+        #sound-toggle:hover {
+            background-color: #f1f5f9;
         }
 
         #log-panel::-webkit-scrollbar {
@@ -91,7 +99,11 @@
             </div>
         </div>
 
-        <div class="h-[45%] airport-map-bg border-t-4 border-gray-800">
+        <div class="h-[45%] airport-map-bg border-t-4 border-gray-800 relative">
+            <button id="sound-toggle" onclick="toggleSound()" class="absolute top-4 right-4 z-40 bg-white bg-opacity-90 px-3 py-2 rounded-lg shadow-md font-bold text-lg border border-gray-300">
+                🔊
+            </button>
+
             <div id="map-overlay" class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center z-30 transition-opacity duration-500">
                 <span class="text-white font-bold tracking-widest text-lg">AWAITING FLIGHT DISPATCH...</span>
             </div>
@@ -177,8 +189,47 @@
         const emptyLogMsg = document.getElementById('empty-log-msg');
         const plane = document.getElementById('animated-plane');
         const mapOverlay = document.getElementById('map-overlay');
+        const soundToggleBtn = document.getElementById('sound-toggle');
         
         let isAnimating = false;
+        let isSoundOn = true;
+
+        // --- 오디오 객체 생성 및 매핑 ---
+        const sfx = {
+            cargoBoarding: new Audio('./data/cargo_boarding.mp3'),
+            passengerBoarding: new Audio('./data/passenger_boarding.mp3'),
+            taxiing: new Audio('./data/taxiing.mp3'),
+            takeoff: new Audio('./data/takeoff.mp3')
+        };
+
+        // 음향 토글 함수
+        function toggleSound() {
+            isSoundOn = !isSoundOn;
+            soundToggleBtn.innerText = isSoundOn ? '🔊' : '🔇';
+            if (!isSoundOn) stopAllSounds();
+        }
+
+        // 특정 오디오 재생 함수
+        function playSound(soundKey) {
+            if (!isSoundOn) return;
+            
+            // 이전 단계의 소리가 겹치지 않도록 현재 재생 중인 모든 소리를 정지
+            stopAllSounds(); 
+            
+            const audio = sfx[soundKey];
+            audio.currentTime = 0; // 처음부터 재생
+            
+            // 재생 시도 (파일이 없거나 브라우저 정책으로 차단될 경우를 대비해 catch 처리)
+            audio.play().catch(error => console.warn("오디오 재생 실패 (파일 누락 또는 브라우저 정책):", error));
+        }
+
+        // 모든 오디오 정지 함수
+        function stopAllSounds() {
+            Object.values(sfx).forEach(audio => {
+                audio.pause();
+                audio.currentTime = 0;
+            });
+        }
 
         // 비동기 대기(sleep) 함수
         const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
@@ -234,27 +285,35 @@
             
             if (classType === 'CargoAircraft') {
                 waypoints = [
-                    { x: '83%', y: '26%', rot: '90deg', duration: 500 },     // [시작점] 화물청사 대기
-                    { x: '83%', y: '19%', rot: '270deg', duration: 1000 },  // 1. 아래로 직진
-                    { x: '78%', y: '19%', rot: '180deg', duration: 1500 }, // 2. 왼쪽으로 꺾기
-                    { x: '78%', y: '85%', rot: '90deg', duration: 1000 },  // 3. 다시 아래로 직진
-                    { x: '70%', y: '85%', rot: '0deg', duration: 1000 },   // 4. 활주로 입구 진입(오른쪽)
-                    { x: '70%', y: '75%', rot: '-90deg', duration: 500 }   // 5. 이륙 방향(위쪽)으로 정렬
+                    { x: '83%', y: '26%', rot: '90deg', duration: 500 },     
+                    { x: '83%', y: '19%', rot: '270deg', duration: 1000 },  
+                    { x: '78%', y: '19%', rot: '180deg', duration: 1500 }, 
+                    { x: '78%', y: '85%', rot: '90deg', duration: 1000 },  
+                    { x: '70%', y: '85%', rot: '0deg', duration: 1000 },   
+                    { x: '70%', y: '75%', rot: '-90deg', duration: 500 }   
                 ];
             } else {
                 waypoints = [
-                    { x: '33%', y: '79%', rot: '136deg', duration: 500 },     // [시작점] 제1터미널 대기
-                    { x: '40%', y: '75%', rot: '0deg', duration: 2000 },  // 1. 오른쪽으로 직진
-                    { x: '40%', y: '85%', rot: '90deg', duration: 2000 }, // 2. 아래로 꺾기
-                    { x: '70%', y: '85%', rot: '0deg', duration: 2000 },  // 3. 오른쪽으로 꺾어서 길게 직진
-                    { x: '70%', y: '75%', rot: '-90deg', duration: 1000 } // 4. 활주로 진입 후 이륙 방향(위쪽) 정렬
+                    { x: '33%', y: '79%', rot: '136deg', duration: 500 },     
+                    { x: '40%', y: '75%', rot: '0deg', duration: 2000 },  
+                    { x: '40%', y: '85%', rot: '90deg', duration: 2000 }, 
+                    { x: '70%', y: '85%', rot: '0deg', duration: 2000 },  
+                    { x: '70%', y: '75%', rot: '-90deg', duration: 1000 } 
                 ];
             }
 
-            // 1. Boarding 단계 (시작점으로 이동)
+            // 1. Boarding 단계
             const startPoint = waypoints[0];
             addLog(`<strong>1. Boarding:</strong><br> ${aircraftInstance.boarding(gateNumber)}`);
             
+            // 객체 타입에 따라 Boarding 사운드 분기 처리
+            if (classType === 'CargoAircraft') {
+                playSound('cargoBoarding');
+            } else {
+                // CommercialAircraft, PassengerAircraft
+                playSound('passengerBoarding');
+            }
+
             plane.style.transition = 'none';
             plane.style.left = startPoint.x;
             plane.style.top = startPoint.y;
@@ -265,40 +324,42 @@
                 plane.style.opacity = '1';
             }, 100);
 
-            await delay(2000); // 탑승 및 대기 시간
+            await delay(2000); 
 
-            // 2. Taxiing 단계 (웨이포인트 순차 이동)
+            // 2. Taxiing 단계
             addLog(`<strong>2. Taxiing:</strong><br> ${aircraftInstance.taxiing()}`);
+            playSound('taxiing'); // 택싱 사운드 재생
             
             for (let i = 1; i < waypoints.length; i++) {
                 const wp = waypoints[i];
                 
-                // [변경점] 1단계: 기수 방향 먼저 회전 (0.4초 소요)
                 plane.style.transition = 'transform 0.4s ease-in-out';
                 plane.style.transform = `rotate(${wp.rot}) scale(1)`;
-                await delay(400); // 기수가 완전히 돌아갈 때까지 대기
+                await delay(400); 
 
-                // [변경점] 2단계: 회전이 끝난 후 해당 방향으로 이동
-                if (wp.duration > 0) { // 제자리 회전용 웨이포인트일 경우 이동 생략
+                if (wp.duration > 0) {
                     plane.style.transition = `left ${wp.duration}ms linear, top ${wp.duration}ms linear`;
                     plane.style.left = wp.x;
                     plane.style.top = wp.y;
                     
-                    await delay(wp.duration); // 해당 위치까지 직진할 때까지 대기
+                    await delay(wp.duration); 
                 }
             }
 
-            await delay(500); // 이륙 전 잠시 대기 (Line up and wait)
+            await delay(500); 
 
-            // 3. Take off 단계 (이륙 애니메이션)
+            // 3. Take off 단계
             addLog(`<strong>3. Take off:</strong><br> ${aircraftInstance.takeOff()}`);
+            playSound('takeoff'); // 이륙 사운드 재생
+            
             plane.style.transition = 'all 2s ease-in';
             plane.style.left = '75%';
-            plane.style.top = '-10%'; // 화면 위쪽 밖으로
-            plane.style.transform = 'rotate(-90deg) scale(2)'; // 커지면서 상승
-            plane.style.opacity = '0'; // 사라짐
+            plane.style.top = '-10%'; 
+            plane.style.transform = 'rotate(-90deg) scale(2)'; 
+            plane.style.opacity = '0'; 
             
             await delay(2000);
+            stopAllSounds(); // 이륙 완료 시 소리 끄기 (선택 사항, 여운을 남기고 싶다면 삭제 가능)
 
             // 시퀀스 완전 종료 및 초기화
             isAnimating = false;
