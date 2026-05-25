@@ -216,7 +216,6 @@
             addLog(adtContent);
         }
 
-        // async 함수로 변경하여 경로 이동을 순차적으로 제어
         async function triggerFlight(aircraftInstance) {
             if (isAnimating) return; 
             isAnimating = true;
@@ -231,35 +230,26 @@
             
             addLog(`✈️ <strong>${classType}</strong> 실행 시퀀스`, true);
 
-            // ==========================================
-            // 💡 [택싱 웨이포인트(경유지) 커스텀 설정]
-            // ==========================================
-            // 아래 배열에 경유지를 추가하거나 수정해서 경로를 만들어주세요.
-            // x, y: 위치(%)
-            // rot: 비행기가 바라보는 방향 (0deg: 오른쪽, 90deg: 아래쪽, 180deg: 왼쪽, -90deg: 위쪽)
-            // duration: 해당 지점까지 이동하는 데 걸리는 시간(ms)
-            
             let waypoints = [];
             
             if (classType === 'CargoAircraft') {
                 waypoints = [
-                    { x: '84%', y: '29%', rot: '90deg', duration: 500 },     // [시작점] 화물청사 대기
-                    { x: '84%', y: '50%', rot: '90deg', duration: 1000 },  // 1. 아래로 직진
-                    { x: '60%', y: '50%', rot: '180deg', duration: 1500 }, // 2. 왼쪽으로 꺾기
-                    { x: '60%', y: '75%', rot: '90deg', duration: 1000 },  // 3. 다시 아래로 직진
-                    { x: '75%', y: '75%', rot: '0deg', duration: 1000 },   // 4. 활주로 입구 진입(오른쪽)
-                    { x: '75%', y: '75%', rot: '-90deg', duration: 500 }   // 5. 이륙 방향(위쪽)으로 정렬
+                    { x: '83%', y: '26%', rot: '90deg', duration: 500 },     // [시작점] 화물청사 대기
+                    { x: '83%', y: '19%', rot: '270deg', duration: 1000 },  // 1. 아래로 직진
+                    { x: '78%', y: '19%', rot: '180deg', duration: 1500 }, // 2. 왼쪽으로 꺾기
+                    { x: '78%', y: '85%', rot: '90deg', duration: 1000 },  // 3. 다시 아래로 직진
+                    { x: '70%', y: '85%', rot: '0deg', duration: 1000 },   // 4. 활주로 입구 진입(오른쪽)
+                    { x: '70%', y: '75%', rot: '-90deg', duration: 500 }   // 5. 이륙 방향(위쪽)으로 정렬
                 ];
             } else {
                 waypoints = [
                     { x: '33%', y: '79%', rot: '136deg', duration: 500 },     // [시작점] 제1터미널 대기
-                    { x: '40%', y: '75%', rot: '0deg', duration: 1500 },  // 1. 오른쪽으로 직진
-                    { x: '40%', y: '85%', rot: '90deg', duration: 1000 }, // 2. 아래로 꺾기
-                    { x: '75%', y: '85%', rot: '0deg', duration: 2000 },  // 3. 오른쪽으로 꺾어서 길게 직진
+                    { x: '40%', y: '75%', rot: '0deg', duration: 2000 },  // 1. 오른쪽으로 직진
+                    { x: '40%', y: '85%', rot: '90deg', duration: 2000 }, // 2. 아래로 꺾기
+                    { x: '70%', y: '85%', rot: '0deg', duration: 2000 },  // 3. 오른쪽으로 꺾어서 길게 직진
                     { x: '70%', y: '75%', rot: '-90deg', duration: 1000 } // 4. 활주로 진입 후 이륙 방향(위쪽) 정렬
                 ];
             }
-            // ==========================================
 
             // 1. Boarding 단계 (시작점으로 이동)
             const startPoint = waypoints[0];
@@ -271,7 +261,7 @@
             plane.style.transform = `rotate(${startPoint.rot}) scale(1)`;
             
             setTimeout(() => {
-                plane.style.transition = 'opacity 0.5s';
+                plane.style.transition = 'opacity 1s';
                 plane.style.opacity = '1';
             }, 100);
 
@@ -282,13 +272,20 @@
             
             for (let i = 1; i < waypoints.length; i++) {
                 const wp = waypoints[i];
-                // 각 이동마다 리니어(등속) 트랜지션 적용
-                plane.style.transition = `all ${wp.duration}ms linear`;
-                plane.style.left = wp.x;
-                plane.style.top = wp.y;
-                plane.style.transform = `rotate(${wp.rot}) scale(1)`;
                 
-                await delay(wp.duration); // 해당 위치까지 이동할 때까지 대기
+                // [변경점] 1단계: 기수 방향 먼저 회전 (0.4초 소요)
+                plane.style.transition = 'transform 0.4s ease-in-out';
+                plane.style.transform = `rotate(${wp.rot}) scale(1)`;
+                await delay(400); // 기수가 완전히 돌아갈 때까지 대기
+
+                // [변경점] 2단계: 회전이 끝난 후 해당 방향으로 이동
+                if (wp.duration > 0) { // 제자리 회전용 웨이포인트일 경우 이동 생략
+                    plane.style.transition = `left ${wp.duration}ms linear, top ${wp.duration}ms linear`;
+                    plane.style.left = wp.x;
+                    plane.style.top = wp.y;
+                    
+                    await delay(wp.duration); // 해당 위치까지 직진할 때까지 대기
+                }
             }
 
             await delay(500); // 이륙 전 잠시 대기 (Line up and wait)
