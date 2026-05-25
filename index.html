@@ -244,8 +244,6 @@
 
         // --- 오디오 객체 생성 및 매핑 ---
         const sfx = {
-            cargoBoarding: new Audio('./data/cargo_boarding.mp3'),
-            passengerBoarding: new Audio('./data/passenger_boarding.mp3'),
             airport: new Audio('./data/base_airport.mp3'),
             taxiing: new Audio('./data/taxiing.mp3'),
             takeoff: new Audio('./data/takeoff.mp3')
@@ -392,13 +390,6 @@
             setTimeout(() => {
                 plane.style.transition = 'opacity 1s';
                 plane.style.opacity = '1';
-                
-                // 안내방송/적재 사운드 중첩 실행 (airport 기본 배경음과 함께 재생)
-                if (isSoundOn) {
-                    const specificAudio = classType === 'CargoAircraft' ? sfx['cargoBoarding'] : sfx['passengerBoarding'];
-                    specificAudio.currentTime = 0;
-                    specificAudio.play().catch(e => console.warn(e));
-                }
             }, 100);
 
             await delay(4000); 
