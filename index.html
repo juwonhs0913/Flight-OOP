@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aircraft OOP Visualization</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <style>
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: #ffffff; 
+        }
+        
+        .node-card {
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .node-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.15);
+        }
+
+        /* 하단 공항 위성사진 맵 설정 */
+        .airport-map-bg {
+            /* 같은 폴더에 있는 로컬 이미지 파일 불러오기 */
+            background-image: url('./airport.jpg');
+            background-color: #334155; 
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #animated-plane {
+            position: absolute;
+            font-size: 2.5rem; 
+            color: black;
+            text-shadow: 0 0 4px rgba(255,255,255,0.8); 
+            opacity: 0;
+            z-index: 20;
+            transition: all 2s ease-in-out; 
+            margin-left: -20px; 
+            margin-top: -20px;
+        }
+
+        #log-panel::-webkit-scrollbar {
+            width: 8px;
+        }
+        #log-panel::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body class="h-screen flex overflow-hidden">
+
+    <div class="w-3/5 flex flex-col border-r border-gray-200">
+        
+        <div class="h-[55%] bg-slate-50 relative p-8 shadow-inner flex flex-col justify-center">
+            <div class="absolute top-4 left-6">
+                <h1 class="text-2xl font-black text-gray-900 tracking-tight">AIRCRAFT OOP HIERARCHY</h1>
+                <p class="text-gray-500 mt-1 text-sm font-medium">클래스 노드를 클릭하여 실행 애니메이션과 다형성을 확인하세요.</p>
+            </div>
+
+            <div class="flex flex-col items-center gap-6 mt-8 relative">
+                <div class="absolute w-1 bg-gray-300 h-[100%] top-6 left-1/2 transform -translate-x-1/2 z-0"></div>
+
+                <button onclick="showADTInfo()" class="node-card bg-gray-50 px-8 py-3 rounded-xl shadow-sm border-2 border-dashed border-gray-500 w-64 flex flex-col items-center z-10 relative cursor-pointer">
+                    <span class="text-2xl text-gray-500 mb-1">&#x2708;</span>
+                    <span class="font-bold text-gray-700">FlightADT</span>
+                    <span class="text-xs text-gray-400 font-semibold">Abstract Base Class</span>
+                </button>
+
+                <button onclick="triggerFlight(baseAircraft)" class="node-card bg-white px-8 py-3 rounded-xl shadow-md border-2 border-gray-800 w-64 flex flex-col items-center z-10 relative">
+                    <span class="text-2xl text-black mb-1">&#x2708;</span>
+                    <span class="font-bold text-gray-900">CommercialAircraft</span>
+                    <span class="text-xs text-gray-500 font-semibold">Base Class</span>
+                </button>
+
+                <div class="flex gap-16 w-full justify-center z-10 relative bg-slate-50 pt-2">
+                    <button onclick="triggerFlight(passengerAircraft)" class="node-card bg-white px-8 py-3 rounded-xl shadow-md border-2 border-blue-600 w-64 flex flex-col items-center">
+                        <span class="text-2xl text-black mb-1">&#x2708;</span>
+                        <span class="font-bold text-gray-900">PassengerAircraft</span>
+                        <span class="text-xs text-blue-600 font-semibold">Derived Class</span>
+                    </button>
+
+                    <button onclick="triggerFlight(cargoAircraft)" class="node-card bg-white px-8 py-3 rounded-xl shadow-md border-2 border-green-600 w-64 flex flex-col items-center">
+                        <span class="text-2xl text-black mb-1">&#x2708;</span>
+                        <span class="font-bold text-gray-900">CargoAircraft</span>
+                        <span class="text-xs text-green-600 font-semibold">Derived Class</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="h-[45%] airport-map-bg border-t-4 border-gray-800">
+            <div id="map-overlay" class="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center z-30 transition-opacity duration-500">
+                <span class="text-white font-bold tracking-widest text-lg">AWAITING FLIGHT DISPATCH...</span>
+            </div>
+            
+            <div id="animated-plane">&#x2708;</div>
+            
+            <div class="absolute bottom-4 left-4 text-white text-xs font-bold bg-black bg-opacity-50 px-2 py-1 rounded">제1 터미널 (GATE AREA)</div>
+            <div class="absolute bottom-2/4 right-4 text-white text-xs font-bold bg-black bg-opacity-50 px-2 py-1 rounded">화물청사 (CARGO AREA)</div>
+            <div class="absolute bottom-4 right-1/4 text-white text-xs font-bold bg-black bg-opacity-60 px-3 py-1.5 rounded">활주로 (RUNWAY)</div>
+        </div>
+    </div>
+
+    <div class="w-2/5 bg-white flex flex-col p-8">
+        <div class="mb-6 border-b pb-4">
+            <h2 class="text-2xl font-bold text-gray-900 tracking-tight">Execution Log</h2>
+            <p class="text-sm text-gray-500 mt-1">상태 전이 및 오버라이딩(Overriding) 로직 출력</p>
+        </div>
+        
+        <div id="log-panel" class="flex-1 overflow-y-auto space-y-4 pr-2 text-sm text-gray-800 font-medium tracking-wide">
+            <div class="text-center text-gray-400 mt-20" id="empty-log-msg">좌측의 클래스 노드를 클릭하여 시퀀스를 시작하세요.</div>
+        </div>
+    </div>
+
+    <script>
+        class CommercialAircraft {
+            constructor(model, callsign) {
+                this.model = model;
+                this.callsign = callsign;
+                this.location = "Hangar";
+            }
+
+            boarding(gateNumber) {
+                this.location = "GATE";
+                return `[${this.callsign} / ${this.model}] ${gateNumber}번 ${this.location}에서 보딩을 시작합니다.`;
+            }
+
+            taxiing() {
+                let msg = `[${this.callsign} / ${this.model}] ${this.location}에서 활주로로 이동합니다.`;
+                this.location = "Runway";
+                return msg;
+            }
+
+            takeOff() {
+                return `[${this.callsign} / ${this.model}] ${this.location}에서 이륙하여 출발합니다.`;
+            }
+        }
+
+        class PassengerAircraft extends CommercialAircraft {
+            constructor(model, callsign, passengerNum) {
+                super(model, callsign);
+                this.passengerNum = passengerNum;
+            }
+
+            boarding(gateNumber) {
+                return `${super.boarding(gateNumber)}<br><span class="text-blue-600 font-bold">↳ [Passenger]</span> 승객 ${this.passengerNum}명이 탑승 중입니다.`;
+            }
+
+            takeOff() {
+                return `${super.takeOff()}<br><span class="text-blue-600 font-bold">↳ [Passenger]</span> ${this.passengerNum}명의 승객과 함께 이륙합니다.`;
+            }
+        }
+
+        class CargoAircraft extends CommercialAircraft {
+            constructor(model, callsign, cargoWeightKg) {
+                super(model, callsign);
+                this.cargoWeightKg = cargoWeightKg;
+            }
+
+            boarding(gateNumber) {
+                return `${super.boarding(gateNumber)}<br><span class="text-green-600 font-bold">↳ [Cargo]</span> ${this.cargoWeightKg}kg 화물을 적재 공간에 싣습니다.`;
+            }
+
+            takeOff() {
+                return `${super.takeOff()}<br><span class="text-green-600 font-bold">↳ [Cargo]</span> ${this.cargoWeightKg}kg의 화물을 싣고 이륙합니다.`;
+            }
+        }
+
+        const baseAircraft = new CommercialAircraft("Generic Model", "BASE001");
+        const passengerAircraft = new PassengerAircraft("Boeing 737", "OZ712", 120);
+        const cargoAircraft = new CargoAircraft("Boeing 777F", "KE195F", 32400);
+
+        const logPanel = document.getElementById('log-panel');
+        const emptyLogMsg = document.getElementById('empty-log-msg');
+        const plane = document.getElementById('animated-plane');
+        const mapOverlay = document.getElementById('map-overlay');
+        
+        let isAnimating = false;
+
+        function addLog(message, isHeader = false) {
+            const div = document.createElement('div');
+            if (isHeader) {
+                div.className = "bg-gray-100 p-3 rounded font-bold text-gray-900 border-l-4 border-gray-800 mt-6 shadow-sm";
+                div.innerHTML = message;
+            } else {
+                div.className = "bg-gray-50 p-4 rounded shadow-sm border border-gray-200 leading-relaxed";
+                div.innerHTML = message;
+            }
+            logPanel.appendChild(div);
+            logPanel.scrollTop = logPanel.scrollHeight;
+        }
+
+        function showADTInfo() {
+            if (emptyLogMsg) emptyLogMsg.style.display = 'none';
+            
+            addLog(`✈️ <strong>FlightADT</strong> 명세서 조회`, true);
+            
+            const adtContent = `
+                <div class="text-gray-900 font-bold text-base mb-3 border-b border-gray-300 pb-2">Flight-ADT를 선택하였습니다.</div>
+                
+                <div class="mb-2"><span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold mr-1">Properties</span></div>
+                <ul class="list-disc list-inside text-gray-600 ml-1 mb-4 space-y-1">
+                    <li>location <span class="text-gray-400 italic">(abstract property)</span></li>
+                    <li>callsign <span class="text-gray-400 italic">(abstract property)</span></li>
+                </ul>
+
+                <div class="mb-2"><span class="bg-gray-200 text-gray-700 px-2 py-0.5 rounded text-xs font-bold mr-1">Methods</span></div>
+                <ul class="list-disc list-inside text-gray-600 ml-1 space-y-1">
+                    <li>boarding(gate_number : int) <span class="text-gray-400 italic">(abstract method)</span></li>
+                    <li>taxiing() <span class="text-gray-400 italic">(abstract method)</span></li>
+                    <li>take_off() <span class="text-gray-400 italic">(abstract method)</span></li>
+                </ul>
+            `;
+            addLog(adtContent);
+        }
+
+        function triggerFlight(aircraftInstance) {
+            if (isAnimating) return; 
+            isAnimating = true;
+
+            if (emptyLogMsg) emptyLogMsg.style.display = 'none';
+            
+            mapOverlay.style.opacity = '0';
+            setTimeout(() => mapOverlay.classList.add('hidden'), 500);
+
+            const gateNumber = Math.floor(Math.random() * 99) + 1;
+            const classType = aircraftInstance.constructor.name;
+            
+            addLog(`✈️ <strong>${classType}</strong> 실행 시퀀스`, true);
+
+            // --- 클래스 타입에 따른 시작 위치 및 방향 계산 분기 ---
+            let startX, startY, startRotation, taxiRotation;
+            
+            if (classType === 'CargoAircraft') {
+                // 화물청사 (오른쪽 중간 구역) 시작
+                startX = '84%';
+                startY = '29%';
+                startRotation = '90deg'; // 남서쪽(대각선 왼쪽 아래)을 향해 대기
+                taxiRotation = '210deg';  // 활주로 진입 시 기수 방향
+            } else {
+                // 제1 터미널 (왼쪽 아래 구역) 시작 - PassengerAircraft 및 Base
+                startX = '15%';
+                startY = '75%';
+                startRotation = '90deg';  // 동쪽(오른쪽)을 향해 대기
+                taxiRotation = '90deg';   // 활주로 진입 시 기수 방향
+            }
+
+            addLog(`<strong>1. Boarding:</strong><br> ${aircraftInstance.boarding(gateNumber)}`);
+            
+            // 지정된 시작 위치에 비행기 배치
+            plane.style.transition = 'none';
+            plane.style.left = startX;
+            plane.style.top = startY;
+            plane.style.transform = `rotate(${startRotation}) scale(1)`;
+            
+            // 서서히 나타남
+            setTimeout(() => {
+                plane.style.transition = 'opacity 0.5s';
+                plane.style.opacity = '1';
+            }, 100);
+
+            // Taxiing: 공통 목적지(활주로 시작점)로 이동
+            setTimeout(() => {
+                addLog(`<strong>2. Taxiing:</strong><br> ${aircraftInstance.taxiing()}`);
+                plane.style.transition = 'all 2.5s ease-in-out';
+                plane.style.left = '75%'; // 활주로 X 좌표
+                plane.style.top = '75%';  // 활주로 Y 좌표
+                plane.style.transform = `rotate(${taxiRotation}) scale(1)`; 
+                
+                // 활주로 진입 완료 시 이륙 방향(북쪽)으로 기수 정렬
+                setTimeout(() => {
+                    plane.style.transform = 'rotate(-90deg) scale(1)'; 
+                }, 2000);
+
+            }, 2000);
+
+            // Take off: 활주로를 따라 이륙
+            setTimeout(() => {
+                addLog(`<strong>3. Take off:</strong><br> ${aircraftInstance.takeOff()}`);
+                plane.style.transition = 'all 2s ease-in';
+                plane.style.left = '75%';
+                plane.style.top = '-10%'; // 화면 밖 위쪽으로 이동
+                plane.style.transform = 'rotate(-90deg) scale(2)'; // 고도 상승 효과
+                plane.style.opacity = '0'; // 사라짐
+                
+                // 애니메이션 종료 및 맵 초기화
+                setTimeout(() => {
+                    isAnimating = false;
+                    mapOverlay.classList.remove('hidden');
+                    mapOverlay.style.opacity = '1';
+                    mapOverlay.querySelector('span').innerText = "DISPATCH COMPLETED. READY FOR NEXT.";
+                }, 2000);
+
+            }, 5500);
+        }
+    </script>
+</body>
+</html>
