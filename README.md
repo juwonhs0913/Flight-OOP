@@ -38,17 +38,13 @@
 
 ---
 
-## 📂 프로젝트 구조 (Project Structure)
-
-\`\`\`text
-- Flight-OOP/
-- ├── index.html               # 메인 UI, 애니메이션 및 OOP 로직
-- └── data/                    # 정적 에셋(Assets) 디렉터리
--    ├── airport.jpg          # 배경 위성 지도 이미지
--    ├── base_airport.mp3     # 공항 앰비언스 사운드
--    ├── taxiing.mp3          # 엔진 시동 및 택싱 사운드
--    └── takeoff.mp3          # 이륙 풀파워 가속 사운드
-\`\`\`
+Flight-OOP/
+├── index.html              # 메인 UI, 애니메이션 및 OOP 로직
+└── data/                   # 정적 에셋(Assets) 디렉터리
+    ├── airport.jpg         # 배경 위성 지도 이미지
+    ├── base_airport.mp3    # 공항 앰비언스 사운드
+    ├── taxiing.mp3         # 엔진 시동 및 택싱 사운드
+    └── takeoff.mp3         # 이륙 풀파워 가속 사운드
 
 ---
 
