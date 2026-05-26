@@ -4,7 +4,7 @@
 
 자료구조 과제 2 (OOP 설계 기반 인터랙티브 웹앱 구현 및 풀사이클 배포)의 일환으로 제작되었습니다.
 
-🔗 **[Live Demo (Vercel 배포 링크)](여기에 Vercel URL 입력)**
+🔗 https://flight-oop.vercel.app/
 
 ---
 
