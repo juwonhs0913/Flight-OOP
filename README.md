@@ -8,7 +8,7 @@
 
 ---
 
-## 🌟 주요 기능 및 디테일 (Details)
+## 🌟 주요 기능 및 디테일 (Key Features & Details)
 
 ### 1. 상속 구조 시각화 (Hierarchy Visualization)
 - `FlightADT` (추상/인터페이스) ➡️ `CommercialAircraft` (Base) ➡️ `PassengerAircraft`, `CargoAircraft` (Derived)로 이어지는 4단계 계층 구조를 트리(Tree) 형태로 깔끔하게 시각화했습니다.
