@@ -8,7 +8,7 @@
 
 ---
 
-## 🌟 주요 기능 (Key Features)
+## 🌟 주요 기능 및 디테일 (Details)
 
 ### 1. 상속 구조 시각화 (Hierarchy Visualization)
 - `FlightADT` (추상/인터페이스) ➡️ `CommercialAircraft` (Base) ➡️ `PassengerAircraft`, `CargoAircraft` (Derived)로 이어지는 4단계 계층 구조를 트리(Tree) 형태로 깔끔하게 시각화했습니다.
@@ -22,6 +22,12 @@
 - 각 비행 단계와 객체 타입에 맞는 커스텀 오디오가 재생됩니다.
 - 우측 상단의 토글(🔊/🔇) 버튼을 통해 재생 중인 모든 오디오를 제어할 수 있습니다.
 
+### 4. 반응형 레이아웃  
+- 화면 사이즈에 맞게 넓은 화면에서는 좌우 분할 뷰로 넓게 시각화하고, 모바일 등 작은 화면인 환경에서는 수직 스택 레이아웃과 가로 스와이프 다이어그램으로 자동 변환되도록 Tailwind CSS를 적용했습니다.
+
+### 5. 인천공항 위성 지도 및 독립적인 커스텀 택싱 루트
+- 단순한 단색 배경이 아닌 실제 인천국제공항 위성 사진을 적용하여 현실성과 시각적 완성도를 높였습니다.
+- 객체의 타입(`PassengerAircraft` vs `CargoAircraft`)에 따라 생성 위치(제1 터미널 vs 화물청사)가 다르게 분기되며, 각기 다른 웨이포인트(Waypoints) 배열을 따라 활주로 진입점까지 이동하는 디테일한 커스텀 노선을 구축했습니다.
 ---
 
 ## 🛠 기술 스택 (Tech Stack)
@@ -35,13 +41,13 @@
 ## 📂 프로젝트 구조 (Project Structure)
 
 \`\`\`text
-Flight-OOP/
-├── index.html               # 메인 UI, 애니메이션 및 OOP 로직
-└── data/                    # 정적 에셋(Assets) 디렉터리
-    ├── airport.jpg          # 배경 위성 지도 이미지
-    ├── base_airport.mp3     # 공항 앰비언스 사운드
-    ├── taxiing.mp3          # 엔진 시동 및 택싱 사운드
-    └── takeoff.mp3          # 이륙 풀파워 가속 사운드
+- Flight-OOP/
+- ├── index.html               # 메인 UI, 애니메이션 및 OOP 로직
+- └── data/                    # 정적 에셋(Assets) 디렉터리
+-    ├── airport.jpg          # 배경 위성 지도 이미지
+-    ├── base_airport.mp3     # 공항 앰비언스 사운드
+-    ├── taxiing.mp3          # 엔진 시동 및 택싱 사운드
+-    └── takeoff.mp3          # 이륙 풀파워 가속 사운드
 \`\`\`
 
 ---
