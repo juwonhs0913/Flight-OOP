@@ -236,13 +236,16 @@
         let isSoundOn = true;
 
         const sfx = {
-            cargoBoarding: new Audio('./data/cargo_boarding.mp3'),
-            passengerBoarding: new Audio('./data/passenger_boarding.mp3'),
             airport: new Audio('./data/base_airport.mp3'),
             taxiing: new Audio('./data/taxiing.mp3'),
             takeoff: new Audio('./data/takeoff.mp3')
         };
 
+        // --- 전체 오디오 볼륨 30% 감소 설정 (0.7) ---
+        Object.values(sfx).forEach(audio => {
+            audio.volume = 0.7; 
+        });
+        
         function toggleSound() {
             isSoundOn = !isSoundOn;
             soundToggleBtn.innerText = isSoundOn ? '🔊' : '🔇';
