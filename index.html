@@ -24,6 +24,7 @@
         .airport-map-bg {
             background-image: url('./data/airport.jpg');
             background-color: #334155; 
+            /* [핵심 수정] cover 대신 100% 100%를 사용하여 어떤 화면 비율에서도 좌표와 맵이 틀어지지 않게 고정 */
             background-size: 100% 100%; 
             background-position: center;
             background-repeat: no-repeat;
@@ -42,7 +43,6 @@
             margin-top: -20px;
         }
 
-        /* 음향 토글 버튼 호버 효과 */
         #sound-toggle {
             transition: background-color 0.2s;
         }
@@ -243,11 +243,6 @@
             takeoff: new Audio('./data/takeoff.mp3')
         };
 
-        // --- 전체 오디오 볼륨 30% 감소 설정 (0.7) ---
-        Object.values(sfx).forEach(audio => {
-            audio.volume = 0.7; 
-        });
-
         function toggleSound() {
             isSoundOn = !isSoundOn;
             soundToggleBtn.innerText = isSoundOn ? '🔊' : '🔇';
@@ -365,16 +360,16 @@
             let waypoints = [];
             if (classType === 'CargoAircraft') {
                 waypoints = [
-                    { x: '83%', y: '23%', rot: '90deg', duration: 0 },     
-                    { x: '83%', y: '16%', rot: '270deg', duration: 819 },  
-                    { x: '78%', y: '16%', rot: '180deg', duration: 756 }, 
-                    { x: '78%', y: '88%', rot: '90deg', duration: 3562 },  
-                    { x: '70%', y: '88%', rot: '180deg', duration: 810 },   
+                    { x: '83%', y: '26%', rot: '90deg', duration: 0 },     
+                    { x: '83%', y: '20%', rot: '270deg', duration: 819 },  
+                    { x: '78%', y: '20%', rot: '180deg', duration: 756 }, 
+                    { x: '78%', y: '81%', rot: '90deg', duration: 3562 },  
+                    { x: '70%', y: '81%', rot: '180deg', duration: 810 },   
                     { x: '70%', y: '75%', rot: '270deg', duration: 813 }   
                 ];
             } else {
                 waypoints = [
-                    { x: '33%', y: '83%', rot: '134deg', duration: 0 },     
+                    { x: '33%', y: '78%', rot: '134deg', duration: 0 },     
                     { x: '41%', y: '78%', rot: '0deg', duration: 1044 },  
                     { x: '41%', y: '81%', rot: '90deg', duration: 651 }, 
                     { x: '70%', y: '81%', rot: '0deg', duration: 3053 },  
