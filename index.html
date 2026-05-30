@@ -307,7 +307,7 @@
                 </ul>
             `;
             addLog(adtContent);
-            scrollToSection('log-section'); // 정보 조회 시 로그창으로 화면 이동
+            scrollToSection('log-section'); 
         }
 
         function showClassInfo(className) {
@@ -329,6 +329,11 @@
                     <ul class="list-disc list-inside text-gray-600 ml-1 mb-3 space-y-1 text-sm">
                         <li>passengerNum : int</li>
                     </ul>
+                    <div class="text-xs text-purple-600 font-bold mb-1">[@Override 된 메소드]</div>
+                    <ul class="list-disc list-inside text-gray-600 ml-1 mb-3 space-y-1 text-sm">
+                        <li><span class="font-semibold text-gray-800">boarding</span>(gateNumber)</li>
+                        <li><span class="font-semibold text-gray-800">takeOff</span>()</li>
+                    </ul>
                 `;
             } else if (className === 'CargoAircraft') {
                 content = `
@@ -338,17 +343,22 @@
                     <ul class="list-disc list-inside text-gray-600 ml-1 mb-3 space-y-1 text-sm">
                         <li>cargoWeightKg : float</li>
                     </ul>
+                    <div class="text-xs text-purple-600 font-bold mb-1">[@Override 된 메소드]</div>
+                    <ul class="list-disc list-inside text-gray-600 ml-1 mb-3 space-y-1 text-sm">
+                        <li><span class="font-semibold text-gray-800">boarding</span>(gateNumber)</li>
+                        <li><span class="font-semibold text-gray-800">takeOff</span>()</li>
+                    </ul>
                 `;
             }
             addLog(content);
-            scrollToSection('log-section'); // 정보 조회 시 로그창으로 화면 이동
+            scrollToSection('log-section'); 
         }
 
         async function triggerFlight(aircraftInstance) {
             if (isAnimating) return; 
             isAnimating = true;
 
-            scrollToSection('map-section'); // 비행 시작 시 모바일 화면을 맵으로 이동
+            scrollToSection('map-section'); 
 
             if (emptyLogMsg) emptyLogMsg.style.display = 'none';
             
@@ -363,7 +373,7 @@
             let waypoints = [];
             if (classType === 'CargoAircraft') {
                 waypoints = [
-                    { x: '83%', y: '26%', rot: '90deg', duration: 0 },     
+                    { x: '83%', y: '26%', rot: '90deg', duration: 0 },    
                     { x: '83%', y: '20%', rot: '270deg', duration: 819 },  
                     { x: '78%', y: '20%', rot: '180deg', duration: 756 }, 
                     { x: '78%', y: '81%', rot: '90deg', duration: 3562 },  
@@ -372,7 +382,7 @@
                 ];
             } else {
                 waypoints = [
-                    { x: '33%', y: '78%', rot: '134deg', duration: 0 },     
+                    { x: '33%', y: '78%', rot: '134deg', duration: 0 },    
                     { x: '41%', y: '78%', rot: '0deg', duration: 1044 },  
                     { x: '41%', y: '81%', rot: '90deg', duration: 651 }, 
                     { x: '70%', y: '81%', rot: '0deg', duration: 3053 },  
@@ -380,9 +390,16 @@
                 ];
             }
 
-            // 1. Boarding (4초 소요)
+            // --- 오버라이딩 상태를 나타내는 UI 뱃지 정의 ---
+            const overrideBadge = `<span class="bg-purple-100 text-purple-700 px-2 py-0.5 rounded text-[10px] font-extrabold tracking-wide ml-2 border border-purple-300 shadow-sm align-middle">@Override</span>`;
+            const inheritedBadge = `<span class="bg-gray-100 text-gray-500 px-2 py-0.5 rounded text-[10px] font-bold tracking-wide ml-2 border border-gray-300 shadow-sm align-middle">Inherited</span>`;
+
+            // 1. Boarding (Overridden in both derived classes)
             const startPoint = waypoints[0];
-            addLog(`<strong>1. Boarding:</strong><br> ${aircraftInstance.boarding(gateNumber)}`);
+            addLog(`
+                <div class="mb-1 text-gray-800"><strong>1. Executing: boarding()</strong> ${overrideBadge}</div>
+                <div class="bg-white p-3 rounded border border-gray-200 text-sm mt-1">${aircraftInstance.boarding(gateNumber)}</div>
+            `);
             
             playSound('airport');
             plane.style.transition = 'none';
@@ -396,17 +413,22 @@
                 
                 if (isSoundOn) {
                     const specificAudio = classType === 'CargoAircraft' ? sfx['cargoBoarding'] : sfx['passengerBoarding'];
-                    specificAudio.currentTime = 0;
-                    specificAudio.play().catch(e => console.warn(e));
+                    if (specificAudio) {
+                        specificAudio.currentTime = 0;
+                        specificAudio.play().catch(e => console.warn(e));
+                    }
                 }
             }, 100);
 
             await delay(4000); 
             await delay(1000); 
 
-            // 2. Taxiing (4초 소요)
-            addLog(`<strong>2. Taxiing:</strong><br> ${aircraftInstance.taxiing()}`);
-            scrollToSection('log-section'); // 택싱 로그를 보여주기 위해 스크롤 살짝 이동
+            // 2. Taxiing (Inherited, NOT overridden)
+            addLog(`
+                <div class="mb-1 text-gray-800"><strong>2. Executing: taxiing()</strong> ${inheritedBadge}</div>
+                <div class="bg-white p-3 rounded border border-gray-200 text-sm mt-1">${aircraftInstance.taxiing()}</div>
+            `);
+            scrollToSection('log-section'); 
             
             playSound('taxiing'); 
             
@@ -422,16 +444,18 @@
                     plane.style.left = wp.x;
                     plane.style.top = wp.y;
                     
-                    // 비행기가 이동하는 동안 맵 중앙으로 화면 유지
                     scrollToSection('map-section'); 
                     await delay(wp.duration); 
                 }
             }
 
-            // 3. Take off (4초 소요)
+            // 3. Take off (Overridden in both derived classes)
             await delay(100);
-            addLog(`<strong>3. Take off:</strong><br> ${aircraftInstance.takeOff()}`);
-            scrollToSection('log-section'); // 이륙 로그 표시
+            addLog(`
+                <div class="mb-1 text-gray-800"><strong>3. Executing: takeOff()</strong> ${overrideBadge}</div>
+                <div class="bg-white p-3 rounded border border-gray-200 text-sm mt-1">${aircraftInstance.takeOff()}</div>
+            `);
+            scrollToSection('log-section'); 
             playSound('takeoff'); 
             
             plane.style.transition = 'all 4s ease-in';
@@ -444,7 +468,6 @@
             }
             plane.style.opacity = '0'; 
             
-            // 이륙 애니메이션을 볼 수 있도록 맵 영역 상단으로 스크롤
             scrollToSection('map-section');
             
             await delay(4000); 
